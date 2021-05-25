@@ -181,11 +181,13 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 		} else if("playback".equals(name)) {
 			xml = R.xml.settings_playback;
 		} else if("servers".equals(name)) {
-			if(Util.installedFromPlayStore(context) || !Util.isSignedByPopeen(context)) {
-				xml = R.xml.settings_servers;
-			}
+			// if(Util.installedFromPlayStore(context) || !Util.isSignedByPopeen(context)) {
+			xml = R.xml.settings_servers;
+			// }
 		} else if ("cast".equals(name)) {
 			xml = R.xml.settings_cast;
+		} else if ("advanced".equals(name)) {
+			xml = R.xml.settings_advanced;
 		} else if ("help".equals(name)) {
 			xml = R.xml.settings_help;
 		}
@@ -237,11 +239,13 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 			}
 		} else if(Constants.PREFERENCES_KEY_THEME.equals(key)) {
 			String value = sharedPreferences.getString(key, null);
+		/* TODO tag, location
 			if("day/night".equals(value) || "day/black".equals(value)) {
 				if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 					ActivityCompat.requestPermissions(context, new String[]{ Manifest.permission.ACCESS_COARSE_LOCATION }, SubsonicActivity.PERMISSIONS_REQUEST_LOCATION);
 				}
 			}
+		 */
 		} else if(Constants.PREFERENCES_KEY_DLNA_CASTING_ENABLED.equals(key)) {
 			DownloadService downloadService = DownloadService.getInstance();
 			if(downloadService != null) {
@@ -658,7 +662,8 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 					megabyteFromat = new DecimalFormat(getResources().getString(R.string.util_bytes_format_megabyte));
 				}
 
-				cacheSize.setSummary(megabyteFromat.format((double) Integer.parseInt(cacheSize.getText())).replace(".00", ""));
+				String maxSize = megabyteFromat.format((double) Integer.parseInt(cacheSize.getText())).replace(".00", "");
+				cacheSize.setSummary("If " + maxSize + " has been downloaded the app will automatically delete the oldest files when downloading new ones");
 			} catch(Exception e) {
 				Log.e(TAG, "Failed to format cache size", e);
 				cacheSize.setSummary(cacheSize.getText());
@@ -670,17 +675,6 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 			tempLoss.setSummary(tempLoss.getEntry());
 			pauseDisconnect.setSummary(pauseDisconnect.getEntry());
 			//videoPlayer.setSummary(videoPlayer.getEntry());
-
-			if(replayGain.isChecked()) {
-				replayGainType.setEnabled(true);
-				replayGainBump.setEnabled(true);
-				replayGainUntagged.setEnabled(true);
-			} else {
-				replayGainType.setEnabled(false);
-				replayGainBump.setEnabled(false);
-				replayGainUntagged.setEnabled(false);
-			}
-			replayGainType.setSummary(replayGainType.getEntry());
 		}
 
 		if(syncEnabled != null) {
@@ -705,6 +699,20 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 			}
 		}
 
+		if(replayGain != null) {
+
+			if(replayGain.isChecked()) {
+				replayGainType.setEnabled(true);
+				replayGainBump.setEnabled(true);
+				replayGainUntagged.setEnabled(true);
+			} else {
+				replayGainType.setEnabled(false);
+				replayGainBump.setEnabled(false);
+				replayGainUntagged.setEnabled(false);
+			}
+			replayGainType.setSummary(replayGainType.getEntry());
+
+		}
 		for (ServerSettings ss : serverSettings.values()) {
 			ss.update();
 		}
@@ -771,6 +779,7 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 		serverUrlPreference.setSummary(serverUrlPreference.getText());
 		screen.setSummary(serverUrlPreference.getText());
 
+		/*
 		final EditTextPreference serverLocalNetworkSSIDPreference = new EditTextPreference(context) {
 			@Override
 			protected void onAddEditTextToDialogView(View dialogView, final EditText editText) {
@@ -819,7 +828,7 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 				return false;
 			}
 		});
-
+		*/
 		final EditTextPreference serverInternalUrlPreference = new EditTextPreference(context);
 		serverInternalUrlPreference.setKey(Constants.PREFERENCES_KEY_SERVER_INTERNAL_URL + instance);
 		serverInternalUrlPreference.getEditText().setInputType(InputType.TYPE_TEXT_VARIATION_URI);
@@ -919,8 +928,8 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 		screen.addPreference(serverNamePreference);
 		screen.addPreference(serverUrlPreference);
 		screen.addPreference(serverInternalUrlPreference);
-		screen.addPreference(serverLocalNetworkSSIDPreference);
-		screen.addPreference(locationPermissionPreference);
+		//screen.addPreference(serverLocalNetworkSSIDPreference);
+		//screen.addPreference(locationPermissionPreference);
 		screen.addPreference(serverUsernamePreference);
 		screen.addPreference(serverPasswordPreference);
 		screen.addPreference(serverSyncPreference);
@@ -1184,7 +1193,7 @@ public class SettingsFragment extends PreferenceCompatFragment implements Shared
 				if (serverName != null) {
 					serverName.setSummary(serverName.getText());
 					serverUrl.setSummary(serverUrl.getText());
-					serverLocalNetworkSSID.setSummary(serverLocalNetworkSSID.getText());
+					//serverLocalNetworkSSID.setSummary(serverLocalNetworkSSID.getText());
 					serverInternalUrl.setSummary(serverInternalUrl.getText());
 					username.setSummary(username.getText());
 
